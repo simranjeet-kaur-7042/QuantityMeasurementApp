@@ -27,6 +27,7 @@ public class QuantityMeasurementApp {
 
     // Main method to test
     public static void main(String[] args) {
+    	//SpringApplication.run(MeasurementApplication.class,args);
         Feet f1 = new Feet(5.0);
         Feet f2 = new Feet(5.0);
 
