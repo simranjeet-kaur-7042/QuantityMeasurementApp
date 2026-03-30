@@ -1,68 +1,37 @@
 package com.quantity.measurement;
 
+import com.quantity.measurement.enums.LengthUnit;
+import com.quantity.measurement.model.QuantityLength;
+import java.util.Scanner;
+
 public class QuantityMeasurementApp {
 
-    // Inner class for Feet
-    static class Feet {
-        private final double value;
-
-        public Feet(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-
-            if (obj == null || getClass() != obj.getClass())
-                return false;
-
-            Feet other = (Feet) obj;
-            return Double.compare(this.value, other.value) == 0;
-        }
-    }
-
-    // Inner class for Inches
-    static class Inches {
-        private final double value;
-
-        public Inches(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-
-            if (obj == null || getClass() != obj.getClass())
-                return false;
-
-            Inches other = (Inches) obj;
-            return Double.compare(this.value, other.value) == 0;
-        }
-    }
-
-    // Method to test Feet equality
-    public static void testFeetEquality() {
-        Feet f1 = new Feet(5.0);
-        Feet f2 = new Feet(5.0);
-
-        System.out.println("Feet equal? " + f1.equals(f2));
-    }
-
-    // Method to test Inches equality
-    public static void testInchesEquality() {
-        Inches i1 = new Inches(10.0);
-        Inches i2 = new Inches(10.0);
-        Inches i3 = new Inches(12.0);
-
-        System.out.println("Inches equal (same values)? " + i1.equals(i2));
-        System.out.println("Inches equal (different values)? " + i1.equals(i3));
-    }
-
-    // Main method
     public static void main(String[] args) {
-        testFeetEquality();
-        testInchesEquality();
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter first value: ");
+            double value1 = Double.parseDouble(scanner.nextLine());
+            System.out.print("Enter first unit (FEET, INCH): ");
+            String unit1 = scanner.nextLine();
+
+            System.out.print("Enter second value: ");
+            double value2 = Double.parseDouble(scanner.nextLine());
+            System.out.print("Enter second unit (FEET, INCH): ");
+            String unit2 = scanner.nextLine();
+
+            // Convert input to uppercase before using valueOf
+            QuantityLength length1 = new QuantityLength(value1, LengthUnit.valueOf(unit1.toUpperCase()));
+            QuantityLength length2 = new QuantityLength(value2, LengthUnit.valueOf(unit2.toUpperCase()));
+
+            if (length1.equals(length2)) {
+                System.out.println("The two lengths are equal.");
+            } else {
+                System.out.println("The two lengths are NOT equal.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
