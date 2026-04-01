@@ -3,8 +3,8 @@ package com.quantity.measurement.model;
 import com.quantity.measurement.enums.LengthUnit;
 
 public class QuantityLength {
-    private double value;
-    private LengthUnit unit;
+    private final double value;
+    private final LengthUnit unit;
 
     public QuantityLength(double value, LengthUnit unit) {
         if (unit == null) {
@@ -13,7 +13,7 @@ public class QuantityLength {
         this.value = value;
         this.unit = unit;
     }
-    
+
     public double toFeet() {
         return unit.toFeet(value);
     }
@@ -21,11 +21,14 @@ public class QuantityLength {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (!(obj instanceof QuantityLength)) return false;
+
         QuantityLength other = (QuantityLength) obj;
-        double thisInFeet=this.unit.toFeet(this.value);
-        double otherInFeet=other.unit.toFeet(other.value);
-        return Double.compare(thisInFeet,otherInFeet) == 0;
+
+        double thisInFeet = this.toFeet();
+        double otherInFeet = other.toFeet();
+
+        return Double.compare(thisInFeet, otherInFeet) == 0;
     }
 
     @Override
