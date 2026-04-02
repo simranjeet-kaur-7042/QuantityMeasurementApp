@@ -6,6 +6,7 @@ public class QuantityLength {
     private final double value;
     private final LengthUnit unit;
 
+    private final double EPSILON=1e-6;
     public QuantityLength(double value, LengthUnit unit) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit cannot be null");
@@ -17,6 +18,27 @@ public class QuantityLength {
     public double toFeet() {
         return unit.toFeet(value);
     }
+    
+    public double toConvert(LengthUnit targetUnit) {
+    	return convert(this.value,this.unit,targetUnit);
+    }
+    
+    public static double convert(double value, LengthUnit sourceUnit, LengthUnit targetUnit) {
+
+        if (sourceUnit == null || targetUnit == null) {
+            throw new IllegalArgumentException("Source/Target unit cannot be null");
+        }
+
+        if (Double.isNaN(value) ||Double.isInfinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
+
+       
+        double valueInFeet = sourceUnit.toFeet(value);
+
+        return targetUnit.fromFeet(valueInFeet);
+    }
+    
 
     @Override
     public boolean equals(Object obj) {
@@ -28,7 +50,7 @@ public class QuantityLength {
         double thisInFeet = this.toFeet();
         double otherInFeet = other.toFeet();
 
-        return Double.compare(thisInFeet, otherInFeet) == 0;
+        return Math.abs(thisInFeet - otherInFeet) < EPSILON;
     }
 
     @Override
