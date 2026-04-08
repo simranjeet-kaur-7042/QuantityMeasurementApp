@@ -58,31 +58,31 @@ public class QuantityLength {
         return value + " " + unit.name();
     }
     
+    private double toBaseUnit() {
+    	return unit.toFeet(value);
+    }
     
-    public QuantityLength add(QuantityLength other) {
-        if (other == null) {
-            throw new IllegalArgumentException("Other quantity cannot be null");
+    
+    public QuantityLength add(QuantityLength other,LengthUnit targetUnit) {
+        if (other == null || targetUnit==null) {
+            throw new IllegalArgumentException("Second quantity and targetUnit  must not be null");
         }
 
-        if (this.unit == null || other.unit == null) {
-            throw new IllegalArgumentException("Unit cannot be null");
-        }
-
-        if (!Double.isFinite(this.value) || !Double.isFinite(other.value)) {
+        if (!Double.isFinite(other.value)) {
             throw new IllegalArgumentException("Invalid numeric value");
         }
+        
+        double thisInFeet = this.toBaseUnit();
+        double otherInFeet = other.toBaseUnit();
 
-        // Convert(feet)
-        double thisInFeet = this.toFeet();
-        double otherInFeet = other.toFeet();
-
-        // Add
         double sumInFeet = thisInFeet + otherInFeet;
 
-        // Convert back to unit of first operand
-        double resultValue = this.unit.fromFeet(sumInFeet);
+        double resultValue = targetUnit.fromFeet(sumInFeet);
 
-        // Return new object (immutability)
-        return new QuantityLength(resultValue, this.unit);
+        return new QuantityLength(resultValue, targetUnit);
+    }
+    
+    public QuantityLength add(QuantityLength other) {
+    	return add(other,this.unit);
     }
 }
