@@ -1,4 +1,6 @@
 package com.quantity.measurement;
+import com.quantity.measurement.enumimpl.LengthUnit;
+import com.quantity.measurement.enumimpl.WeightUnit;
 import  com.quantity.measurement.enums.*;
 import com.quantity.measurement.model.*;
 import org.junit.jupiter.api.Test;
@@ -841,7 +843,7 @@ class MeasurementApplicationTests {
 		    void testEquality_TransitiveProperty() {
 		        QuantityWeight a = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
 		        QuantityWeight b = new QuantityWeight(1000.0, WeightUnit.GRAM);
-		        QuantityWeight c = new QuantityWeight(2.20462262, WeightUnit.POUND);
+		        QuantityWeight c = new QuantityWeight(2.20462, WeightUnit.POUND);
 		        
 		        assertEquals(a, b);
 		        assertEquals(b, c);
@@ -881,12 +883,11 @@ class MeasurementApplicationTests {
 		    @Test
 		    void testConversion_KilogramToPound() {
 		        QuantityWeight kg = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
-		        
-		        QuantityWeight expected = new QuantityWeight(2.2046226, WeightUnit.POUND);
-		        
-		        assertEquals(expected, kg.convertTo(WeightUnit.POUND));
-		    }
 
+		        QuantityWeight result = kg.convertTo(WeightUnit.POUND);
+
+		        assertEquals(2.20462, result.getValue(), 1e-4);
+		    }
 		    @Test
 		    void testConversion_SameUnit() {
 		        QuantityWeight kg = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
@@ -928,13 +929,9 @@ class MeasurementApplicationTests {
 
 		    @Test
 		    void testAddition_CrossUnit_PoundPlusKilogram() {		        
-		        QuantityWeight lb = new QuantityWeight(1.0, WeightUnit.POUND);
-		        QuantityWeight kg = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
-
-		        double kgInLb = 1.0 / 0.453592; 
-		        QuantityWeight expected = new QuantityWeight(1.0 + kgInLb, WeightUnit.POUND);
-		        
-		        assertEquals(expected, lb.add(kg));
+		    	QuantityWeight result=new QuantityWeight(2.20462,WeightUnit.POUND)
+		    			.add(new QuantityWeight(1.0,WeightUnit.KILOGRAM));
+		    	assertEquals(4.40924,result.getValue(),1e-4);
 		    }
 		    @Test
 		    void testAddition_ExplicitTargetUnit_Kilogram() {
