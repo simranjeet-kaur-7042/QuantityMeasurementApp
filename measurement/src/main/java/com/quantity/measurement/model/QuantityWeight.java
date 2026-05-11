@@ -18,39 +18,31 @@ public class QuantityWeight {
         return quantity.getUnit();
     }
 
-    // CONVERT
+    public QuantityWeight add(QuantityWeight other) {
+        Quantity<WeightUnit> result = quantity.add(other.quantity);
+        return new QuantityWeight(result.getValue(), result.getUnit());
+    }
+
+    public QuantityWeight add(QuantityWeight other, WeightUnit targetUnit) {
+        Quantity<WeightUnit> result = quantity.add(other.quantity, targetUnit);
+        return new QuantityWeight(result.getValue(), result.getUnit());
+    }
+
     public QuantityWeight convertTo(WeightUnit targetUnit) {
         Quantity<WeightUnit> result = quantity.convertTo(targetUnit);
         return new QuantityWeight(result.getValue(), result.getUnit());
     }
 
-    // ADD
-    public QuantityWeight add(QuantityWeight other) {
-        return add(other, this.getUnit());
-    }
-
-    // ADD with target unit
-    public QuantityWeight add(QuantityWeight other, WeightUnit targetUnit) {
-        Quantity<WeightUnit> result =this.quantity.add(other.quantity, targetUnit);
-        return new QuantityWeight(result.getValue(), result.getUnit());
-    }
-
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof QuantityWeight)) return false;
-
-        QuantityWeight other = (QuantityWeight) obj;
-        return this.quantity.equals(other.quantity);
+    public boolean equals(Object o) {
+        if (!(o instanceof QuantityWeight)) {
+            return false;
+        }
+        return this.quantity.equals(((QuantityWeight) o).quantity);
     }
 
     @Override
     public int hashCode() {
         return quantity.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return quantity.toString();
     }
 }

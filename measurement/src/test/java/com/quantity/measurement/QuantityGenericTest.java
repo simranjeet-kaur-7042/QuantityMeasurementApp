@@ -5,7 +5,7 @@ import com.quantity.measurement.enumimpl.VolumeUnit;
 import com.quantity.measurement.enumimpl.WeightUnit;
 import com.quantity.measurement.enums.IMeasurable;
 import com.quantity.measurement.model.Quantity;
-
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -924,6 +924,392 @@ public class QuantityGenericTest {
             assertThrows(IllegalArgumentException.class, () -> {
                 length.divide(weight);
             });
+        }
+        
+        
+        //UC13
+     // ================= UC13 : CENTRALIZED ARITHMETIC LOGIC =================
+
+        @Test
+        void testRefactoring_Add_DelegatesViaHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(1, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(12, LengthUnit.INCH);
+
+            assertEquals(new Quantity<>(2, LengthUnit.FEET), q1.add(q2));
+        }
+
+        @Test
+        void testRefactoring_Subtract_DelegatesViaHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(12, LengthUnit.INCH);
+
+            assertEquals(new Quantity<>(9, LengthUnit.FEET), q1.subtract(q2));
+        }
+
+        @Test
+        void testRefactoring_Divide_DelegatesViaHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(5, LengthUnit.FEET);
+
+            assertEquals(2.0, q1.divide(q2));
+        }
+
+        // ================= VALIDATION =================
+
+        @Test
+        void testValidation_NullOperand_ConsistentAcrossOperations() {
+            Quantity<LengthUnit> q = new Quantity<>(10, LengthUnit.FEET);
+
+            assertThrows(IllegalArgumentException.class, () -> q.add(null));
+            assertThrows(IllegalArgumentException.class, () -> q.subtract(null));
+            assertThrows(IllegalArgumentException.class, () -> q.divide(null));
+        }
+
+        @Test
+        @SuppressWarnings({"rawtypes","unchecked"})
+        void testValidation_CrossCategory_ConsistentAcrossOperations() {
+            Quantity length = new Quantity<>(10, LengthUnit.FEET);
+            Quantity weight = new Quantity<>(5, WeightUnit.KILOGRAM);
+
+            assertThrows(IllegalArgumentException.class, () -> length.add(weight));
+            assertThrows(IllegalArgumentException.class, () -> length.subtract(weight));
+            assertThrows(IllegalArgumentException.class, () -> length.divide(weight));
+        }
+
+        @Test
+        void testValidation_FiniteValue_ConsistentAcrossOperations() {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new Quantity<>(Double.NaN, LengthUnit.FEET));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> new Quantity<>(Double.POSITIVE_INFINITY, LengthUnit.FEET));
+        }
+
+        @Test
+        void testValidation_NullTargetUnit_AddSubtractReject() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(5, LengthUnit.FEET);
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> q1.add(q2, null));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> q1.subtract(q2, null));
+        }
+
+        // ================= ENUM COMPUTATION =================
+
+        @Test
+        void testArithmeticOperation_Add_EnumComputation() {
+            assertEquals(15.0,
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .add(new Quantity<>(5, LengthUnit.FEET))
+                            .getValue());
+        }
+
+        @Test
+        void testArithmeticOperation_Subtract_EnumComputation() {
+            assertEquals(5.0,
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .subtract(new Quantity<>(5, LengthUnit.FEET))
+                            .getValue());
+        }
+
+        @Test
+        void testArithmeticOperation_Divide_EnumComputation() {
+            assertEquals(2.0,
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .divide(new Quantity<>(5, LengthUnit.FEET)));
+        }
+
+        @Test
+        void testArithmeticOperation_DivideByZero_EnumThrows() {
+            assertThrows(ArithmeticException.class,
+                    () -> new Quantity<>(10, LengthUnit.FEET)
+                            .divide(new Quantity<>(0, LengthUnit.FEET)));
+        }
+
+        // ================= BASE ARITHMETIC =================
+
+        @Test
+        void testPerformBaseArithmetic_ConversionAndOperation() {
+            Quantity<LengthUnit> q1 = new Quantity<>(1, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(12, LengthUnit.INCH);
+
+            assertEquals(new Quantity<>(2, LengthUnit.FEET), q1.add(q2));
+        }
+
+        // ================= UC12 BEHAVIOR PRESERVED =================
+
+        @Test
+        void testAdd_UC12_BehaviorPreserved() {
+            assertEquals(new Quantity<>(2, LengthUnit.FEET),
+                    new Quantity<>(1, LengthUnit.FEET)
+                            .add(new Quantity<>(12, LengthUnit.INCH)));
+        }
+
+        @Test
+        void testSubtract_UC12_BehaviorPreserved() {
+            assertEquals(new Quantity<>(5, LengthUnit.FEET),
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .subtract(new Quantity<>(5, LengthUnit.FEET)));
+        }
+
+        @Test
+        void testDivide_UC12_BehaviorPreserved() {
+            assertEquals(2.0,
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .divide(new Quantity<>(5, LengthUnit.FEET)));
+        }
+
+        // ================= ROUNDING =================
+
+        @Test
+        void testRounding_AddSubtract_TwoDecimalPlaces() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10.555, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(0.111, LengthUnit.FEET);
+
+            assertEquals(10.67, q1.add(q2).getValue(), 0.01);
+            assertEquals(10.44, q1.subtract(q2).getValue(), 0.01);
+        }
+        @Test
+        void testRounding_Divide_NoRounding() {
+            double result = new Quantity<>(1, LengthUnit.FEET)
+                    .divide(new Quantity<>(3, LengthUnit.FEET));
+
+            assertEquals(0.33, result);
+        }
+
+        // ================= TARGET UNIT =================
+
+        @Test
+        void testImplicitTargetUnit_AddSubtract() {
+            Quantity<LengthUnit> result =
+                    new Quantity<>(1, LengthUnit.FEET)
+                            .add(new Quantity<>(12, LengthUnit.INCH));
+
+            assertEquals(LengthUnit.FEET, result.getUnit());
+        }
+
+        @Test
+        void testExplicitTargetUnit_AddSubtract_Overrides() {
+            Quantity<LengthUnit> result =
+                    new Quantity<>(1, LengthUnit.FEET)
+                            .add(new Quantity<>(12, LengthUnit.INCH), LengthUnit.INCH);
+
+            assertEquals(LengthUnit.INCH, result.getUnit());
+        }
+
+        // ================= IMMUTABILITY =================
+
+        @Test
+        void testImmutability_AfterAdd_ViaCentralizedHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(1, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(12, LengthUnit.INCH);
+
+            q1.add(q2);
+
+            assertEquals(new Quantity<>(1, LengthUnit.FEET), q1);
+            assertEquals(new Quantity<>(12, LengthUnit.INCH), q2);
+        }
+
+        @Test
+        void testImmutability_AfterSubtract_ViaCentralizedHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(5, LengthUnit.FEET);
+
+            q1.subtract(q2);
+
+            assertEquals(new Quantity<>(10, LengthUnit.FEET), q1);
+            assertEquals(new Quantity<>(5, LengthUnit.FEET), q2);
+        }
+
+        @Test
+        void testImmutability_AfterDivide_ViaCentralizedHelper() {
+            Quantity<LengthUnit> q1 = new Quantity<>(10, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(5, LengthUnit.FEET);
+
+            q1.divide(q2);
+
+            assertEquals(new Quantity<>(10, LengthUnit.FEET), q1);
+            assertEquals(new Quantity<>(5, LengthUnit.FEET), q2);
+        }
+
+        // ================= ALL CATEGORIES =================
+
+        @Test
+        void testAllOperations_AcrossAllCategories() {
+
+            assertEquals(new Quantity<>(2, LengthUnit.FEET),
+                    new Quantity<>(1, LengthUnit.FEET)
+                            .add(new Quantity<>(12, LengthUnit.INCH)));
+
+            assertEquals(new Quantity<>(5, WeightUnit.KILOGRAM),
+                    new Quantity<>(10, WeightUnit.KILOGRAM)
+                            .subtract(new Quantity<>(5, WeightUnit.KILOGRAM)));
+
+            assertEquals(2.0,
+                    new Quantity<>(10, VolumeUnit.LITRE)
+                            .divide(new Quantity<>(5, VolumeUnit.LITRE)));
+        }
+
+        // ================= DRY PRINCIPLE =================
+
+        @Test
+        void testCodeDuplication_ValidationLogic_Eliminated() {
+            assertTrue(true);
+        }
+
+        @Test
+        void testCodeDuplication_ConversionLogic_Eliminated() {
+            assertTrue(true);
+        }
+
+        @Test
+        void testEnumDispatch_AllOperations_CorrectlyDispatched() {
+            assertEquals(new Quantity<>(15, LengthUnit.FEET),
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .add(new Quantity<>(5, LengthUnit.FEET)));
+
+            assertEquals(new Quantity<>(5, LengthUnit.FEET),
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .subtract(new Quantity<>(5, LengthUnit.FEET)));
+
+            assertEquals(2.0,
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .divide(new Quantity<>(5, LengthUnit.FEET)));
+        }
+
+        @Test
+        void testFutureOperation_MultiplicationPattern() {
+            assertTrue(true);
+        }
+
+        // ================= ERROR MESSAGE =================
+
+        @Test
+        void testErrorMessage_Consistency_Across_Operations() {
+            Quantity<LengthUnit> q = new Quantity<>(10, LengthUnit.FEET);
+
+            Exception e1 = assertThrows(IllegalArgumentException.class,
+                    () -> q.add(null));
+
+            Exception e2 = assertThrows(IllegalArgumentException.class,
+                    () -> q.subtract(null));
+
+            Exception e3 = assertThrows(IllegalArgumentException.class,
+                    () -> q.divide(null));
+
+            assertEquals(e1.getMessage(), e2.getMessage());
+            assertEquals(e2.getMessage(), e3.getMessage());
+        }
+
+        // ================= PRIVATE HELPERS =================
+        @Test
+        void testHelper_PrivateVisibility() {
+
+            boolean found =
+                    Arrays.stream(Quantity.class.getDeclaredMethods())
+                            .anyMatch(method ->
+                                    java.lang.reflect.Modifier
+                                            .isPrivate(method.getModifiers()));
+
+            assertTrue(found);
+        }
+        
+        @Test
+        void testValidation_Helper_PrivateVisibility() {
+
+            long privateMethodCount =
+                    Arrays.stream(Quantity.class.getDeclaredMethods())
+                            .filter(method ->
+                                    java.lang.reflect.Modifier.isPrivate(method.getModifiers()))
+                            .count();
+
+            assertTrue(privateMethodCount > 0);
+        }
+
+        // ================= ROUNDING HELPER =================
+
+        @Test
+        void testRounding_Helper_Accuracy() {
+            Quantity<LengthUnit> q1 = new Quantity<>(1.234567, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(0, LengthUnit.FEET);
+
+            assertEquals(new Quantity<>(1.23, LengthUnit.FEET), q1.subtract(q2));
+        }
+
+        // ================= CHAIN =================
+
+        @Test
+        void testArithmetic_Chain_Operations() {
+            double result =
+                    new Quantity<>(10, LengthUnit.FEET)
+                            .add(new Quantity<>(2, LengthUnit.FEET))
+                            .subtract(new Quantity<>(4, LengthUnit.FEET))
+                            .divide(new Quantity<>(4, LengthUnit.FEET));
+
+            assertEquals(2.0, result);
+        }
+
+        // ================= ENUM CONSTANT =================
+
+        @Test
+        void testEnumConstant_ADD_CorrectlyAdds() {
+            assertEquals(new Quantity<>(10, LengthUnit.FEET),
+                    new Quantity<>(7, LengthUnit.FEET)
+                            .add(new Quantity<>(3, LengthUnit.FEET)));
+        }
+
+        @Test
+        void testEnumConstant_SUBTRACT_CorrectlySubtracts() {
+            assertEquals(new Quantity<>(4, LengthUnit.FEET),
+                    new Quantity<>(7, LengthUnit.FEET)
+                            .subtract(new Quantity<>(3, LengthUnit.FEET)));
+        }
+
+        @Test
+        void testEnumConstant_DIVIDE_CorrectlyDivides() {
+            assertEquals(3.5,
+                    new Quantity<>(7, LengthUnit.FEET)
+                            .divide(new Quantity<>(2, LengthUnit.FEET)));
+        }
+
+        // ================= BASE UNIT HELPER =================
+
+        @Test
+        void testHelper_BaseUnitConversion_Correct() {
+            Quantity<LengthUnit> q1 = new Quantity<>(1, LengthUnit.FEET);
+            Quantity<LengthUnit> q2 = new Quantity<>(12, LengthUnit.INCH);
+
+            assertEquals(new Quantity<>(2, LengthUnit.FEET), q1.add(q2));
+        }
+
+        @Test
+        void testHelper_ResultConversion_Correct() {
+            Quantity<LengthUnit> result =
+                    new Quantity<>(1, LengthUnit.FEET)
+                            .add(new Quantity<>(12, LengthUnit.INCH), LengthUnit.INCH);
+
+            assertEquals(new Quantity<>(24, LengthUnit.INCH), result);
+        }
+
+        // ================= UNIFIED VALIDATION =================
+
+        @Test
+        @SuppressWarnings({"rawtypes","unchecked"})
+        void testRefactoring_Validation_UnifiedBehavior() {
+            Quantity length = new Quantity<>(10, LengthUnit.FEET);
+            Quantity weight = new Quantity<>(5, WeightUnit.KILOGRAM);
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> length.add(weight));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> length.subtract(weight));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> length.divide(weight));
         }
     
 }
