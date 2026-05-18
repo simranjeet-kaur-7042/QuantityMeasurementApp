@@ -1,8 +1,8 @@
 package com.quantity.measurement;
-import com.quantity.measurement.enumimpl.LengthUnit;
-import com.quantity.measurement.enumimpl.WeightUnit;
-import  com.quantity.measurement.enums.*;
-import com.quantity.measurement.model.*;
+import com.app.quantitymeasurement.enumimpl.LengthUnit;
+import com.app.quantitymeasurement.enumimpl.WeightUnit;
+import  com.app.quantitymeasurement.enums.*;
+import com.app.quantitymeasurement.model.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 class MeasurementApplicationTests {

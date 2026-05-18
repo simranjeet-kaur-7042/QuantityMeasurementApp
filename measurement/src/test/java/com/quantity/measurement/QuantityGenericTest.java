@@ -1,10 +1,11 @@
 package com.quantity.measurement;
-import com.quantity.measurement.enumimpl.TemperatureUnit;
-import com.quantity.measurement.enumimpl.LengthUnit;
-import com.quantity.measurement.enumimpl.VolumeUnit;
-import com.quantity.measurement.enumimpl.WeightUnit;
-import com.quantity.measurement.enums.IMeasurable;
-import com.quantity.measurement.model.Quantity;
+import com.app.quantitymeasurement.enumimpl.LengthUnit;
+import com.app.quantitymeasurement.enumimpl.TemperatureUnit;
+import com.app.quantitymeasurement.enumimpl.VolumeUnit;
+import com.app.quantitymeasurement.enumimpl.WeightUnit;
+import com.app.quantitymeasurement.enums.IMeasurable;
+import com.app.quantitymeasurement.model.Quantity;
+
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 

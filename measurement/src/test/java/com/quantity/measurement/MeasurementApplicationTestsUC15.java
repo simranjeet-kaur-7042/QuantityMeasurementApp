@@ -1,12 +1,12 @@
 package com.quantity.measurement;
 
-import com.quantity.measurement.controller.Controller;
-import com.quantity.measurement.dto.QuantityDTO;
-import com.quantity.measurement.entity.Entity;
-import com.quantity.measurement.repository.CacheRepository;
-import com.quantity.measurement.repository.Repository;
-import com.quantity.measurement.service.Service;
-import com.quantity.measurement.serviceimpl.ServiceImpl;
+import com.app.quantitymeasurement.controller.Controller;
+import com.app.quantitymeasurement.dto.QuantityDTO;
+import com.app.quantitymeasurement.entity.Entity;
+import com.app.quantitymeasurement.repoimpl.CacheRepository;
+import com.app.quantitymeasurement.repository.Repository;
+import com.app.quantitymeasurement.service.Service;
+import com.app.quantitymeasurement.serviceimpl.ServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
