@@ -54,12 +54,13 @@ public class SecurityConfig {
             
             // 6. Google OAuth2 Login Setup
             .oauth2Login(oauth2 -> oauth2
-                // Login successful hone par yeh callback execute hoga aur JWT return karega
+                // 🔥 BADLAV YAHAN HAI: Login successful hone par token ke saath Frontend par redirect karega
                 .successHandler((request, response, authentication) -> {
                     String token = tokenProvider.generateToken(authentication);
-                    response.setContentType("application/json");
-                    response.setCharacterEncoding("UTF-8");
-                    response.getWriter().write("{\"token\": \"" + token + "\", \"tokenType\": \"Bearer\"}");
+                    
+                    // User ko wapas React App (localhost:3000) par bheja aur URL mein token jod diya
+                    String targetUrl = "http://localhost:3000?token=" + token;
+                    response.sendRedirect(targetUrl);
                 })
             );
 
@@ -72,10 +73,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200")); // React/Angular ports
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Sirf aapka React app
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true); // Token bhejne ke liye zaroori
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
