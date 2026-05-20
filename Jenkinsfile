@@ -1,8 +1,12 @@
 pipeline {
     agent any
+    options {
+        // Agar Jenkins restart ho, toh pipeline khud ko retry kare
+        retry(2)
+    }
     tools {
-        maven 'Maven3' // Wahi naam jo aapne Tool settings mein diya tha
-        nodejs 'Node18' // Wahi naam jo aapne Tool settings mein diya tha
+        maven 'Maven3'
+        nodejs 'Node18'
     }
     stages {
         stage('Build Backend') {
