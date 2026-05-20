@@ -1,57 +1,124 @@
 package com.app.quantitymeasurement.dto;
 
-import java.io.Serializable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
-// UC16: QuantityDTO maintained for cross-package visibility
-public class QuantityDTO implements Serializable {
+public class QuantityDTO {
 
-    private static final long serialVersionUID = 1L;
+    @NotNull(message = "Value cannot be null")
+    @Positive(message = "Value must be positive")
+    private Double value;
 
-    private double value;
+    @NotBlank(message = "Unit cannot be empty")
     private String unit;
+
+    @NotBlank(message = "Measurement type cannot be empty")
     private String measurementType;
+
     private boolean error;
+
     private String errorMessage;
 
-    // Constructor for success
-    public QuantityDTO(double value, String unit, String measurementType) {
+    // Default constructor
+    public QuantityDTO() {
+    }
+
+    // Full constructor
+    public QuantityDTO(Double value,
+                       String unit,
+                       String measurementType,
+                       boolean error,
+                       String errorMessage) {
+
+        this.value = value;
+        this.unit = unit;
+        this.measurementType = measurementType;
+        this.error = error;
+        this.errorMessage = errorMessage;
+    }
+
+    // Success constructor
+    public QuantityDTO(Double value,
+                       String unit,
+                       String measurementType) {
+
         this.value = value;
         this.unit = unit;
         this.measurementType = measurementType;
         this.error = false;
     }
 
-    // Constructor for errors
-    public QuantityDTO(boolean error, String errorMessage) {
+    // Error constructor
+    public QuantityDTO(boolean error,
+                       String errorMessage) {
+
         this.error = error;
         this.errorMessage = errorMessage;
     }
 
-    public double getValue() {
+    // =========================
+    // GETTERS & SETTERS
+    // =========================
+
+    public Double getValue() {
         return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
     }
 
     public String getUnit() {
         return unit;
     }
 
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public String getMeasurementType() {
         return measurementType;
+    }
+
+    public void setMeasurementType(String measurementType) {
+        this.measurementType = measurementType;
     }
 
     public boolean isError() {
         return error;
     }
 
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
     public String getErrorMessage() {
         return errorMessage;
     }
-    
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     @Override
     public String toString() {
+
         if (error) {
-            return "QuantityDTO [error=" + error + ", message=" + errorMessage + "]";
+
+            return "QuantityDTO [error=" +
+                    error +
+                    ", message=" +
+                    errorMessage +
+                    "]";
         }
-        return "QuantityDTO [value=" + value + ", unit=" + unit + ", type=" + measurementType + "]";
+
+        return "QuantityDTO [value=" +
+                value +
+                ", unit=" +
+                unit +
+                ", type=" +
+                measurementType +
+                "]";
     }
 }
